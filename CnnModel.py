@@ -41,9 +41,10 @@ def model(allSong, targetList):
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     csv_logger = CSVLogger("model.csv", append=True)
-    model.fit(X_train, y_train, validation_data=(X_valid, y_valid), epochs=500, batch_size=64, verbose=2, callbacks=[csv_logger])
-  # scores = model.evaluate(X_train, y_train, verbose=0)
-  # print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+    model.fit(X_train, y_train, validation_data=(X_valid, y_valid), epochs=500, batch_size=64, verbose=2,
+              callbacks=[csv_logger])
+    # scores = model.evaluate(X_train, y_train, verbose=0)
+    # print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
     saveModelToJSON(model, "model")
 
 
@@ -54,6 +55,7 @@ def saveModelToJSON(model, name: str):
         json_file.write(model_json)
     model.save_weights("./model.h5")
     print("Model kaydedildi.")
+
 
 if __name__ == '__main__':
     main()
