@@ -1,3 +1,6 @@
+from tkinter import Label
+
+from sklearn.model_selection import train_test_split
 from tensorflow.python.keras.models import model_from_json
 import numpy as np
 import dataset
@@ -5,7 +8,8 @@ import SpotifyConnection
 
 
 # Urisi girilen şarkının hit tahmininin gerçekleştirilmesi
-def predictionSong(songUri: str):
+def predictionSong(songUri: str,songNameLabel: Label, artistNameLabel: Label, hitRateLabel: Label, resultLabel: Label):
+
     # Girilin uri "spotify:track:URI" şeklinde ise URI kısmını ayırmak için kullanılır.
     if songUri.find("spotify") != -1:
         songUri = songUri[14:]
@@ -23,6 +27,11 @@ def predictionSong(songUri: str):
     #veri setinden şarkının alınması ve tahmini
     mysong = allSong[-1:]
     predict = model.predict(mysong)
+
+    songNameLabel['text'] = "SONG NAME: " + songName
+    artistNameLabel['text'] = "ARTIST NAME: " + artistName
+    hitRateLabel['text'] = "HIT RATE: % " + "%.2f" % (predict[0][0] * 100)
+
     print("*************HIT SONG PREDICTION*************")
     print("Song Name: " +songName)
     print("Artist Name:" +artistName)
@@ -30,8 +39,10 @@ def predictionSong(songUri: str):
 
     if predict >= 0.7:
         print("SONG IS HIT!")
+        resultLabel['text'] = "THIS SONG IS HIT!"
     else:
         print("SONG IS NOT HIT!")
+        resultLabel['text'] = "THIS SONG IS NOT HIT!"
 
 # Modelin dosya sisteminden okunmasını sağlar.
 def readModelFromJSON():
@@ -47,4 +58,5 @@ def readModelFromJSON():
 
 
 if __name__ == '__main__':
-    predictionSong("spotify:track:6ICZQc8fr18dK37RN6R2YL")
+ predictionSong("spotify:track:6ICZQc8fr18dK37RN6R2YL")
+

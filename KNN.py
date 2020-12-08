@@ -1,5 +1,6 @@
 import pickle
 
+import joblib
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import numpy as np
@@ -29,7 +30,8 @@ def model(allSong, targetList):
     X_train, X_test, y_train, y_test = train_test_split(allSong, targetList, test_size=0.2)
     knn = KNeighborsClassifier(n_neighbors=13)
     knn.fit(X_train, y_train)
-    saved_model = pickle.dumps(knn)
+    joblib.dump(knn,'KNN.pkl')
+
 
     for i in range(len(X_test)):
         predict_me = np.array(X_test[i].astype(float))
@@ -41,9 +43,9 @@ def model(allSong, targetList):
     print("Accuracy of K-NN classifier on training set: {:.2f}".format(knn.score(X_train, y_train)))
     print("Accuracy of K-NN classifier on test set: {:.2f}".format(knn.score(X_test, y_test)))
 
-    predictionSong(saved_model)
+    predictionSong()
 
-def predictionSong(saved_model):
+def predictionSong():
 
     songUri = "spotify:track:03cu7r9g4b9yjTq6GHWcMG"
     if songUri.find("spotify") != -1:
@@ -56,9 +58,8 @@ def predictionSong(saved_model):
     allSong = allSong / allSong.max(axis=0)
 
     mysong = allSong[-1:]
-    # Load the pickled model
-    knn_from_pickle = pickle.loads(saved_model)
-    y_pred = knn_from_pickle.predict(mysong)
+    model = joblib.load('KNN.pkl', mmap_mode='r')
+    y_pred = model.predict(mysong)
 
     print(y_pred)
     print("Sanatçı:"+artistName)

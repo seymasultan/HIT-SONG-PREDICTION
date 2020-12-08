@@ -1,5 +1,6 @@
 import pickle
 
+import joblib
 from sklearn.model_selection import train_test_split
 import numpy as np
 from sklearn.metrics import confusion_matrix
@@ -28,7 +29,7 @@ def model(allSong, targetList):
     X_train, X_test, y_train, y_test = train_test_split(allSong, targetList, test_size=0.2)
     bnb = GaussianNB()
     bnb.fit(X_train, y_train)
-    saved_model = pickle.dumps(bnb)
+    joblib.dump(bnb, 'BNB.pkl')
 
     for i in range(len(X_test)):
         predict_me = np.array(X_test[i].astype(float))
@@ -40,10 +41,10 @@ def model(allSong, targetList):
     print("Accuracy of Decision Tree classifier on training set: {:.2f}".format(bnb.score(X_train, y_train)))
     print("Accuracy of Decision Tree classifier on test set: {:.2f}".format(bnb.score(X_test, y_test)))
 
-    predictionSong(saved_model)
+    predictionSong()
 
 
-def predictionSong(saved_model):
+def predictionSong():
     songUri = "spotify:track:1aaI0imelqLqye35922oMD"
     if songUri.find("spotify") != -1:
         songUri = songUri[14:]
@@ -55,8 +56,8 @@ def predictionSong(saved_model):
     allSong = allSong / allSong.max(axis=0)
 
     mySong = allSong[-1:]
-    bnb_from_pickle = pickle.loads(saved_model)
-    y_pred = bnb_from_pickle.predict(mySong)
+    model = joblib.load('BNB.pkl', mmap_mode='r')
+    y_pred = model.predict(mySong)
     print(y_pred)
     print("Sanatçı:" + artistName)
     print("Şarkı Adı:" + songName)
