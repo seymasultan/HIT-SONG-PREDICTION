@@ -3,7 +3,7 @@ import pickle
 import joblib
 from sklearn.model_selection import train_test_split
 import numpy as np
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
 from sklearn.svm import SVC
 import SpotifyConnection
 import dataset
@@ -41,6 +41,7 @@ def model(allSong, targetList):
         predicted.append(prediction)
 
     print(confusion_matrix(y_test, predicted))
+    print(classification_report(y_test, predicted))
     print("Accuracy of Decision Tree classifier on training set: {:.2f}".format(svc.score(X_train, y_train)))
     print("Accuracy of Decision Tree classifier on test set: {:.2f}".format(svc.score(X_test, y_test)))
 
@@ -59,7 +60,7 @@ def predictionSong():
     allSong = allSong / allSong.max(axis=0)
 
     mySong = allSong[-1:]
-    model = joblib.load('KNN.pkl', mmap_mode='r')
+    model = joblib.load('SVM.pkl', mmap_mode='r')
     y_pred = model.predict(mySong)
     print(y_pred)
     print("Sanatçı:" + artistName)

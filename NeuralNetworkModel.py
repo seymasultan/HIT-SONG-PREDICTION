@@ -4,7 +4,7 @@ from keras.models import Sequential
 from keras.callbacks import CSVLogger
 import dataset
 import numpy as np
-
+from matplotlib import pyplot as plt
 
 def main():
     allSong, targetList = dataset.main()
@@ -41,10 +41,11 @@ def model(allSong, targetList):
 
     model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     csv_logger = CSVLogger("model.csv", append=True)
-    model.fit(X_train, y_train, validation_data=(X_valid, y_valid), epochs=500, batch_size=64, verbose=2,
+    history=model.fit(X_train, y_train, validation_data=(X_valid, y_valid), epochs=1000, batch_size=64, verbose=2,
               callbacks=[csv_logger])
-    #scores = model.evaluate(X_train, y_train, verbose=0)
-    #print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+    scores = model.evaluate(X_train, y_train, verbose=0)
+    print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
+    drawingGraph(history)
     saveModelToJSON(model, "model")
 
 
@@ -56,6 +57,15 @@ def saveModelToJSON(model, name: str):
     model.save_weights("./model.h5")
     print("Model kaydedildi.")
 
+def drawingGraph(history):
+    plt.figure(figsize=(8, 6))
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['loss'])
+    plt.title('Training Loss and Accuracy')
+    plt.ylabel('Accuracy/Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['train_acc','train_loss'], loc='lower left')
+    plt.show()
 
 if __name__ == '__main__':
     main()

@@ -7,8 +7,7 @@ import dataset
 
 
 def predictionSong(songUri: str, songNameLabel: Label, artistNameLabel: Label, hitRateLabel: Label, resultLabel: Label,
-                   decisionHitLabel: Label,
-                   decisionResult: Label, knnHitLabel: Label, knnResult: Label, svmHitLabel: Label, svmResult: Label,
+                   decisionHitLabel: Label, decisionResult: Label, knnHitLabel: Label, knnResult: Label, svmHitLabel:Label, svmResult: Label,
                    bayesHitLabel: Label, bayesResult: Label):
     if songUri.find("spotify") != -1:
         songUri = songUri[14:]
@@ -26,56 +25,58 @@ def predictionSong(songUri: str, songNameLabel: Label, artistNameLabel: Label, h
     print("Song Name: " + songName)
     print("Artist Name:" + artistName)
 
-    songNameLabel['text'] = "SONG NAME: " + songName
-    artistNameLabel['text'] = "ARTIST NAME: " + artistName
+    songNameLabel['text'] = "ŞARKI İSMİ: " + songName
+    artistNameLabel['text'] = "SANATÇI İSMİ: " + artistName
 
-    predict, result = neuralPredict(mysong)
-    hitRateLabel['text'] = "HIT RATE: % " + "%.2f" % (predict[0][0] * 100)
-    resultLabel['text'] = "RESULT: " + result
+    predict, predictions, result = neuralPrediction(mysong)
+    hitRateLabel['text'] = "POPÜLER OLMA İHTİMALİ: % " + "%.2f" % (predict[0][0] * 100)+" "+str(predictions[0])
+    resultLabel['text'] = "SONUÇ: " + result
     print("Hit Rate: %" + "%.2f" % (predict[0][0] * 100))
 
-    predict, result = decisionTreePredict(mysong)
-    decisionHitLabel['text'] = "HIT : " + str(predict)
-    decisionResult['text'] = "RESULT: " + result
+    predict, result = decisionTreePrediction(mysong)
+    decisionHitLabel['text'] = "POPÜLERLİK : " + str(predict)
+    decisionResult['text'] = "SONUÇ: " + result
 
     predict, result = knnPrediction(mysong)
-    knnHitLabel['text'] = "HIT : " + str(predict)
-    knnResult['text'] = "RESULT: " + result
+    knnHitLabel['text'] = "POPÜLERLİK : " + str(predict)
+    knnResult['text'] = "SONUÇ: " + result
 
     predict, result = svmPrediction(mysong)
-    svmHitLabel['text'] = "HIT : " + str(predict)
-    svmResult['text'] = "RESULT: " + result
+    svmHitLabel['text'] = "POPÜLERLİK : " + str(predict)
+    svmResult['text'] = "SONUÇ: " + result
 
     predict, result = bayesPrediction(mysong)
-    bayesHitLabel['text'] = "HIT : " + str(predict)
-    bayesResult['text'] = "RESULT: " + result
+    bayesHitLabel['text'] = "POPÜLERLİK : " + str(predict)
+    bayesResult['text'] = "SONUÇ: " + result
 
 
-def neuralPredict(mysong):
+def neuralPrediction(mysong):
     model = readModelFromJSON()
 
     predict = model.predict(mysong)
-
-    if predict >= 0.7:
+    predictions= model.predict_classes(mysong)
+    print(predictions[0])
+    print(predict)
+    if predict >= 0.50:
         print("THIS SONG IS HIT!")
-        result = "THIS SONG IS HIT!"
-        return predict, result
+        result = "BU ŞARKI POPÜLER!"
+        return predict, predictions, result
     else:
         print("THIS SONG IS NOT HIT!")
-        result = "THIS SONG IS NOT HIT!"
-        return predict, result
+        result = "BU ŞARKI POPÜLER DEĞİL!"
+        return predict, predictions, result
 
 
-def decisionTreePredict(mysong):
+def decisionTreePrediction(mysong):
     model = joblib.load('decisionTree.pkl', mmap_mode='r')
     predict = model.predict(mysong)
     if (predict == [0]):
         print("THIS SONG IS NOT HIT")
-        result = "THIS SONG IS NOT HIT!"
+        result = "BU ŞARKI POPÜLER DEĞİL!"
         return predict, result
     else:
         print("THIS SONG IS HIT")
-        result = "THIS SONG IS HIT!"
+        result = "BU ŞARKI POPÜLER!"
         return predict, result
 
 
@@ -84,24 +85,24 @@ def knnPrediction(mysong):
     predict = model.predict(mysong)
     if (predict == [0]):
         print("THIS SONG IS NOT HIT")
-        result = "THIS SONG IS NOT HIT!"
+        result = "BU ŞARKI POPÜLER DEĞİL!"
         return predict, result
     else:
         print("THIS SONG IS HIT")
-        result = "THIS SONG IS HIT!"
+        result = "BU ŞARKI POPÜLER!"
         return predict, result
 
 
 def svmPrediction(mysong):
-    model = joblib.load('KNN.pkl', mmap_mode='r')
+    model = joblib.load('SVM.pkl', mmap_mode='r')
     predict = model.predict(mysong)
     if (predict == [0]):
         print("THIS SONG IS NOT HIT")
-        result = "THIS SONG IS NOT HIT!"
+        result = "BU ŞARKI POPÜLER DEĞİL!"
         return predict, result
     else:
         print("THIS SONG IS HIT")
-        result = "THIS SONG IS HIT!"
+        result = "BU ŞARKI POPÜLER!"
         return predict, result
 
 
@@ -110,11 +111,11 @@ def bayesPrediction(mysong):
     predict = model.predict(mysong)
     if (predict == [0]):
         print("THIS SONG IS NOT HIT")
-        result = "THIS SONG IS NOT HIT!"
+        result = "BU ŞARKI POPÜLER DEĞİL!"
         return predict, result
     else:
         print("THIS SONG IS HIT")
-        result = "THIS SONG IS HIT!"
+        result = "BU ŞARKI POPÜLER!"
         return predict, result
 
 
@@ -133,41 +134,41 @@ def readModelFromJSON():
 
 def gui():
     root = Tk()
-    root.geometry("700x500")
-    root.title("Hit Song Prediction")
+    root.geometry("400x500")
+    root.title("Popüler Şarkı Tahmini")
     root.resizable(False,False)
     frame = Frame(root, background='white')
     frame.pack(fill=BOTH, expand=True)
-    header = Label(frame, text="---------------- HIT PREDICTOR ----------------", font='Helvetica 12 bold',bg='white')
+    header = Label(frame, text="---------------- POPÜLER ŞARKI TAHMİN EDİCİ ----------------", font='Helvetica 12 bold',bg='white')
     header.pack()
-    enterText = Label(frame, text="Please enter Spotify URI of your song", font='Helvetica 8 bold',bg='white')
+    enterText = Label(frame, text="Lütfen şarkınızın Spotify URI bilgisini giriniz", font='Helvetica 8 bold',bg='white')
     enterText.pack()
     getUri = Entry(frame, width=40)
     getUri.pack()
-    songName = Label(frame, text="SONG NAME: - ",bg='white')
-    artistName = Label(frame, text="ARTIST NAME: - ",bg='white')
-    hitRate = Label(frame, text="HIT RATE: - ",bg='white')
-    result = Label(frame, text="RESULT: - ",bg='white')
-    decisionHitRate = Label(frame, text="HIT: - ",bg='white')
-    decisionResult = Label(frame, text="RESULT: - ",bg='white')
-    knnHitRate = Label(frame, text="HIT: - ",bg='white')
-    knnResult = Label(frame, text="RESULT: - ",bg='white')
-    svmHitRate = Label(frame, text="HIT: - ",bg='white')
-    svmResult = Label(frame, text="RESULT: - ",bg='white')
-    bayesHitRate = Label(frame, text="HIT: - ",bg='white')
-    bayesResult = Label(frame, text="RESULT: - ",bg='white')
-    searchButton = Button(frame, text="Predict!", command=(
-        lambda: predictionSong(getUri.get(), songName, artistName, hitRate, result, decisionHitRate,
-                               decisionResult, knnHitRate, knnResult, svmHitRate, svmResult, bayesHitRate,
+    songName = Label(frame, text="ŞARKI İSMİ: - ",bg='white')
+    artistName = Label(frame, text="SANATÇI İSMİ: - ",bg='white')
+    hitRate = Label(frame, text="POPÜLER OLMA İHTİMALİ: - ",bg='white')
+    result = Label(frame, text="SONUÇ: - ",bg='white')
+    decisionHitRate = Label(frame, text="POPÜLERLİK: - ",bg='white')
+    decisionResult = Label(frame, text="SONUÇ: - ",bg='white')
+    knnHitRate = Label(frame, text="POPÜLERLİK: - ",bg='white')
+    knnResult = Label(frame, text="SONUÇ: - ",bg='white')
+    svmHitRate = Label(frame, text="POPÜLERLİK: - ",bg='white')
+    svmResult = Label(frame, text="SONUÇ: - ",bg='white')
+    bayesHitRate = Label(frame, text="POPÜLERLİK: - ",bg='white')
+    bayesResult = Label(frame, text="SONUÇ: - ",bg='white')
+    searchButton = Button(frame, text="Tahmin Et!", command=(
+        lambda: predictionSong(getUri.get(), songName, artistName, hitRate, result,decisionHitRate,
+                               decisionResult,knnHitRate, knnResult, svmHitRate, svmResult,bayesHitRate,
                                bayesResult)),bg='#33FFFF', width=20)
     searchButton.pack()
     songName.pack()
     artistName.pack()
-    neuralText = Label(frame, text="Neural Network", font='Helvetica 10 bold',bg='white')
+    neuralText = Label(frame, text="Yapay Sinir Ağı", font='Helvetica 10 bold',bg='white')
     neuralText.pack()
     hitRate.pack()
     result.pack()
-    decisionText = Label(frame, text="Decision Tree", font='Helvetica 10 bold',bg='white')
+    decisionText = Label(frame, text="Karar Ağacı", font='Helvetica 10 bold',bg='white')
     decisionText.pack()
     decisionHitRate.pack()
     decisionResult.pack()

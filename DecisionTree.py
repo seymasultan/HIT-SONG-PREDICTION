@@ -2,7 +2,7 @@ import joblib
 import matplotlib.pyplot as plt
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
 
 import SpotifyConnection
 import dataset
@@ -27,7 +27,7 @@ def listNormalizer(mylist: np.ndarray):
 def model(allSong, targetList):
     predicted=[]
     X_train, X_test, y_train, y_test = train_test_split(allSong, targetList, test_size=0.2)
-    dtr = DecisionTreeClassifier(random_state=0)
+    dtr = DecisionTreeClassifier(random_state=0, criterion = "gini")
     # Makinemizi eğittik
     dtr.fit(X_train, y_train)
     joblib.dump(dtr,'decisionTree.pkl')
@@ -39,6 +39,7 @@ def model(allSong, targetList):
         predicted.append(prediction)
 
     print(confusion_matrix(y_test, predicted))
+    print(classification_report(y_test, predicted))
     print("Accuracy of Decision Tree classifier on training set: {:.2f}".format(dtr.score(X_train, y_train)))
     print("Accuracy of Decision Tree classifier on test set: {:.2f}".format(dtr.score(X_test, y_test)))
 

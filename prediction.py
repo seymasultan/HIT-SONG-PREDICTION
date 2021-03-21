@@ -8,7 +8,7 @@ import SpotifyConnection
 
 
 # Urisi girilen şarkının hit tahmininin gerçekleştirilmesi
-def predictionSong(songUri: str,songNameLabel: Label, artistNameLabel: Label, hitRateLabel: Label, resultLabel: Label):
+def predictionSong(songUri: str):
 
     # Girilin uri "spotify:track:URI" şeklinde ise URI kısmını ayırmak için kullanılır.
     if songUri.find("spotify") != -1:
@@ -27,11 +27,6 @@ def predictionSong(songUri: str,songNameLabel: Label, artistNameLabel: Label, hi
     #veri setinden şarkının alınması ve tahmini
     mysong = allSong[-1:]
     predict = model.predict(mysong)
-
-    songNameLabel['text'] = "SONG NAME: " + songName
-    artistNameLabel['text'] = "ARTIST NAME: " + artistName
-    hitRateLabel['text'] = "HIT RATE: % " + "%.2f" % (predict[0][0] * 100)
-
     print("*************HIT SONG PREDICTION*************")
     print("Song Name: " +songName)
     print("Artist Name:" +artistName)
@@ -39,10 +34,8 @@ def predictionSong(songUri: str,songNameLabel: Label, artistNameLabel: Label, hi
 
     if predict >= 0.7:
         print("SONG IS HIT!")
-        resultLabel['text'] = "THIS SONG IS HIT!"
     else:
         print("SONG IS NOT HIT!")
-        resultLabel['text'] = "THIS SONG IS NOT HIT!"
 
 # Modelin dosya sisteminden okunmasını sağlar.
 def readModelFromJSON():

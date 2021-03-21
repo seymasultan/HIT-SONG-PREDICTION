@@ -4,7 +4,7 @@ import joblib
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split
 import numpy as np
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report
 import matplotlib.pyplot as plt
 import SpotifyConnection
 import dataset
@@ -40,9 +40,11 @@ def model(allSong, targetList):
         predicted.append(prediction)
 
     print(confusion_matrix(y_test, predicted))
+    print(classification_report(y_test, predicted))
     print("Accuracy of K-NN classifier on training set: {:.2f}".format(knn.score(X_train, y_train)))
     print("Accuracy of K-NN classifier on test set: {:.2f}".format(knn.score(X_test, y_test)))
 
+    #drafting(X_train,X_test,y_train,y_test)
     predictionSong()
 
 def predictionSong():
@@ -71,8 +73,9 @@ def predictionSong():
         print("THIS SONG IS HIT")
 
 
+
 def drafting(X_train,X_test,y_train,y_test):
-    neighbors = np.arange(6, 18)
+    neighbors = np.arange(1,15 )
     train_accuracy = np.empty(len(neighbors))
     test_accuracy = np.empty(len(neighbors))
 
@@ -85,13 +88,12 @@ def drafting(X_train,X_test,y_train,y_test):
         train_accuracy[i] = knn.score(X_train, y_train)
         test_accuracy[i] = knn.score(X_test, y_test)
 
-    # Generate plot
-    plt.plot(neighbors, test_accuracy, label='Testing dataset Accuracy')
-    plt.plot(neighbors, train_accuracy, label='Training dataset Accuracy')
+    plt.plot(neighbors, test_accuracy, label='Test veri seti')
+    plt.plot(neighbors, train_accuracy, label='Eğitim veri seti')
 
     plt.legend()
-    plt.xlabel('n_neighbors')
-    plt.ylabel('Accuracy')
+    plt.xlabel('Komşu sayısı (n_neighbors)')
+    plt.ylabel('Doğruluk (Accuracy)')
     plt.show()
 
 if __name__ == '__main__':
